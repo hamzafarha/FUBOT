@@ -9,40 +9,42 @@
 #include "personne.h"
 #define LOADING_BAR_WIDTH 300
 #define LOADING_BAR_HEIGHT 20
-#define MAX_TIME 4 // maximum time
-// Function to generate an enigma from a file
+#define MAX_TIME 4 
+
 void genererEnigme(enigme *e, char *nomfichier) {
 
     FILE *f = fopen(nomfichier, "r");
     if (f == NULL) {
         printf("Erreur lors de l'ouverture du fichier %s\n", nomfichier);
-        //exit(1);
+        
     }
 
     int num_enigmes = 0;
     char line[MAX_LINE_LENGTH];
-    while (fgets(line, MAX_LINE_LENGTH, f) != NULL) {//reads a line of text from the file and stores it in the character array line, which has a maximum length of MAX_LINE_LENGTH characters
-        if (strncmp(line, "Question: ", 10) == 0) {//function is used to compare the first 10 characters of the current line to the string "Question: 
-            num_enigmes++; //count the num_enigme
+    while (fgets(line, MAX_LINE_LENGTH, f) != NULL) {
+        if (strncmp(line, "Question: ", 10) == 0) {/ 
+            num_enigmes++;
         }
     }
 
     if (num_enigmes == 0) {
         printf("Le fichier %s ne contient aucune enigme.\n", nomfichier);
-        //exit(1);
+        
     }
     
-    //printf("Nombres des Questions : %d \n", num_enigmes);
+
 
     srand(time(NULL));
-    int enigme_num = rand() % num_enigmes + 1; //random number between 1 and the number of enigme in the file
-    rewind(f); //the next read operation on the file will start from the beginning of the file
+    int enigme_num = rand() % num_enigmes + 1; 
+    
+    rewind(f); 
 
     int current_enigme = 0;
     while (fgets(line, MAX_LINE_LENGTH, f) != NULL) {
         if (strncmp(line, "Question: ", 10) == 0) {
             current_enigme++;
-            if (current_enigme == enigme_num) { //When current_enigme reaches the selected enigme_num, the code extracts the enigme  
+            if (current_enigme == enigme_num) { 
+            
             sscanf(line + 10, "%[^\n]", e->question);
             sscanf(fgets(line, MAX_LINE_LENGTH, f) + 3, "%[^\n]", e->reponseA);
             sscanf(fgets(line, MAX_LINE_LENGTH, f) + 3, "%[^\n]", e->reponseB);
@@ -56,12 +58,11 @@ void genererEnigme(enigme *e, char *nomfichier) {
 
     fclose(f);
     
-    ////
     
     
     SDL_Color textColor = { 255, 255, 255, 255 };
     TTF_Init();
-    // Load font
+   
     e->fontquestion = TTF_OpenFont("font/questionfont.ttf", 29);
     e->fontanswers = TTF_OpenFont("font/answerfont.otf", 32);
     if (e->fontquestion == NULL) {
@@ -80,7 +81,7 @@ void genererEnigme(enigme *e, char *nomfichier) {
         return;
     }
 
-    // Render answer options
+    
     e->answerSurfaceA = TTF_RenderText_Blended(e->fontanswers, e->reponseA, textColor);
     e->answerSurfaceB= TTF_RenderText_Blended(e->fontanswers, e->reponseB, textColor);
     e->answerSurfaceC = TTF_RenderText_Blended(e->fontanswers, e->reponseC, textColor);
@@ -97,29 +98,28 @@ void genererEnigme(enigme *e, char *nomfichier) {
     printf("Failed to load background image: %s\n", IMG_GetError());
     }
     
-    // Set positions of surfaces
+    
     e->positionquestion.x = 200;
     e->positionquestion.y = 150;
     e->positionquestion.w = e->questionSurface->w;
     e->positionquestion.h = e->questionSurface->h; 
-    //
-        // Set positions of surfaces
-    e->positionReponse1.x = 300; // the rectange start from 220
+    
+    e->positionReponse1.x = 300; 
     e->positionReponse1.y = 405;
     e->positionReponse1.w = 45;
     e->positionReponse1.h = 45;
     //
-    e->positionReponse2.x = 700; // the rectange start from 630
+    e->positionReponse2.x = 700; 
     e->positionReponse2.y = 405;
     e->positionReponse2.w = 45;
     e->positionReponse2.h = 45;
     //
-    e->positionReponse3.x = 300; // the rectange start from 220
+    e->positionReponse3.x = 300; 
     e->positionReponse3.y = 507;
     e->positionReponse3.w = 45;
     e->positionReponse3.h = 45;
     //
-    e->positionReponse4.x = 700; // from 630
+    e->positionReponse4.x = 700; 
     e->positionReponse4.y = 507;
     e->positionReponse4.w = 45;
     e->positionReponse4.h = 45; 
@@ -132,46 +132,43 @@ void genererEnigme(enigme *e, char *nomfichier) {
     
     e->anima.posanim.x=0;
     e->anima.posanim.y=0;
-    //
-    //e->positionWait.x = 600;
-    //e->positionWait.y = 450;
-    //
+    
     e->positionWait.x = 500;
     e->positionWait.y = 650;
 }
 
 void afficherEnigme(enigme e, SDL_Surface *screen) {
     SDL_BlitSurface(e.Backgroundimg, NULL, screen, NULL);
-    //
+    
     SDL_BlitSurface(e.questionSurface, NULL, screen,&e.positionquestion);
     SDL_BlitSurface(e.answerSurfaceA, NULL, screen, &e.positionReponse1);
     SDL_BlitSurface(e.answerSurfaceB, NULL, screen, &e.positionReponse2);
     SDL_BlitSurface(e.answerSurfaceC, NULL, screen, &e.positionReponse3);
     SDL_BlitSurface(e.answerSurfaceD, NULL, screen, &e.positionReponse4);
-    //SDL_Flip(screen);
+    
 }
 
 void afficherTemps(enigme e, SDL_Surface * screen, int timeLeft) {
     char text[20];
     sprintf(text, "Temps : %d", timeLeft);
 
-    SDL_Color color = { 255, 255, 255 }; // white
+    SDL_Color color = { 255, 255, 255 }; 
     SDL_Surface * textSurface = TTF_RenderText_Solid(e.fontquestion, text, color);
     SDL_BlitSurface(textSurface, NULL, screen, &e.positionTemps);
-    //SDL_Flip(screen);
+    
     SDL_FreeSurface(textSurface);
 }
 
 
 void afficherWait(enigme e, SDL_Surface *screen, int timeLeft) {
-    // Calculate the position of the loading bar
+  
     int loadingBarX = (SCREEN_WIDTH - LOADING_BAR_WIDTH) / 2;
     int loadingBarY = 660;
 
-    // Calculate the percentage of time remaining
+
     float progress = (float)timeLeft / (float)MAX_TIME;
 
-    // Create the background rectangle
+    
     SDL_Rect backgroundRect = {
         loadingBarX,
         loadingBarY,
@@ -180,19 +177,19 @@ void afficherWait(enigme e, SDL_Surface *screen, int timeLeft) {
     };
     SDL_FillRect(screen, &backgroundRect, SDL_MapRGB(screen->format, 255, 255, 255));
 
-    // Create the progress rectangle
+
     SDL_Rect progressRect = {
         loadingBarX,
         loadingBarY,
         (int)(progress * LOADING_BAR_WIDTH),
         LOADING_BAR_HEIGHT
     };
-    SDL_FillRect(screen, &progressRect, SDL_MapRGB(screen->format, 255, 0, 0)); // RED color
+    SDL_FillRect(screen, &progressRect, SDL_MapRGB(screen->format, 255, 0, 0)); 
 
-    // Display the time remaining text
+    
     char text[20];
     sprintf(text, "%d", timeLeft);
-    SDL_Color color = { 255, 255, 255 }; // white
+    SDL_Color color = { 255, 255, 255 }; 
     SDL_Surface* textSurface = TTF_RenderText_Blended(e.fontquestion, text, color);
     SDL_Rect textRect = {
         loadingBarX + LOADING_BAR_WIDTH / 2 - textSurface->w / 2,
@@ -213,22 +210,22 @@ void afficherWait(enigme e, SDL_Surface *screen, int timeLeft) {
 void afficherProgress(enigme e,SDL_Surface * screen, int progress) {
     char text[20];
     sprintf(text, "3/%d", progress);
-    SDL_Color color = { 255, 255, 255 }; // white
+    SDL_Color color = { 255, 255, 255 }; 
     SDL_Surface * textSurface = TTF_RenderText_Solid(e.fontquestion, text, color);
     SDL_Rect positionProgress;
     //
     SDL_BlitSurface(textSurface, NULL, screen,&e.positionprogress);
-    //SDL_Flip(screen);
+    
     SDL_FreeSurface(textSurface);
 }
 
 
 void animerEnigme(enigme *e)
 {
-    // initialize the screen
+    
     SDL_Surface *ecranAnimation = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 32, SDL_HWSURFACE|SDL_DOUBLEBUF);
 
-    // check if the screen was properly initialized
+    
     if (ecranAnimation == NULL)
     {
         printf("Failed to initialize screen: %s\n", SDL_GetError());
@@ -245,10 +242,10 @@ void animerEnigme(enigme *e)
         sprintf(ch,"animation/%d.png",j);
         Myimages_[j]=IMG_Load(ch);
 
-        // check if the image was properly loaded
+        
         if (Myimages_[j] == NULL)
         {
-            //printf("Failed to load image %s: \n", ch);
+            
             return;
         }
     }
@@ -257,18 +254,18 @@ void animerEnigme(enigme *e)
     {
         SDL_BlitSurface(Myimages_[j], NULL, ecranAnimation, &e->anima.posanim);
         SDL_Flip(ecranAnimation);
-        //printf("image %s loaded \n",ch);
+        
         SDL_Delay(120);
         SDL_FreeSurface(Myimages_[j]);
     } 
-    // add a delay of 1 seconds after the animation finishes
+    
     SDL_Delay(1000);
 }
 
 
 void playMusic(const char* filename)
 {
-    // load MP3 file
+    
     Mix_Music *music = Mix_LoadMUS(filename);
 
     if (music == NULL) {
@@ -276,9 +273,9 @@ void playMusic(const char* filename)
         return;
     }
     
-    Mix_VolumeMusic(MIX_MAX_VOLUME); // set volume to 100%
+    Mix_VolumeMusic(MIX_MAX_VOLUME); 
 
-    // play MP3 file
+    
     if (Mix_PlayMusic(music, 1) == -1) {
         printf("Failed to play music: %s\n", Mix_GetError());
         return;
@@ -286,10 +283,10 @@ void playMusic(const char* filename)
        
         if (music != NULL) {
         if (Mix_PlayingMusic() == 0) {
-            // Music is not playing, free it
+            
             Mix_FreeMusic(music);
             music = NULL;           
-            // cleanup SDL mixer
+           
             Mix_CloseAudio();
         }
     }
@@ -311,32 +308,32 @@ void free_all(enigme e)
 { 
     if (e.Backgroundimg != NULL) {
         SDL_FreeSurface(e.Backgroundimg);
-       // e.Backgroundimg = NULL;
+       
     }
 
     if (e.questionSurface != NULL) {
         SDL_FreeSurface (e.questionSurface) ;
-       // e.questionSurface = NULL;
+       
     }
 
     if (e.answerSurfaceA != NULL) {
         SDL_FreeSurface(e.answerSurfaceA);
-       // e.answerSurfaceA = NULL;
+       
     }
 
     if (e.answerSurfaceB != NULL) {
         SDL_FreeSurface(e.answerSurfaceB);
-      //  e.answerSurfaceB = NULL;
+      
     }
 
     if (e.answerSurfaceC != NULL) {
         SDL_FreeSurface(e.answerSurfaceC);
-      //  e.answerSurfaceC = NULL;
+      
     }
 
     if (e.answerSurfaceD != NULL) {
         SDL_FreeSurface(e.answerSurfaceD);
-      //  e.answerSurfaceD = NULL;
+      
     }
     
     TTF_CloseFont(e.fontquestion);
@@ -348,35 +345,35 @@ void free_all(enigme e)
 void ImageGameOver(SDL_Surface *ecran)
 {    
     SDL_Surface* image = NULL;
-    // Load the image
+    
     image = IMG_Load("images/over.jpg");
-    // Display the image
+    
     SDL_BlitSurface(image, NULL, ecran, NULL);
-    // Free the surface
+    
     SDL_FreeSurface(image);
 }
 
 void ImageGameWin(SDL_Surface *ecran)
 {    
     SDL_Surface* image = NULL;
-    // Load the image
+   
     image = IMG_Load("images/win.jpg");
-    // Display the image
+    
     SDL_BlitSurface(image, NULL, ecran, NULL);
-    // Free the surface
+    
     SDL_FreeSurface(image);
 }
 
 
 void sauvegarder(Personne p, background b, char *nomfichier)
 {
-    FILE *fichier = fopen(nomfichier, "wb"); // open file for writing in binary mode
+    FILE *fichier = fopen(nomfichier, "wb"); 
     if (fichier == NULL) {
         fprintf(stderr, "Error: Cannot open file '%s' for writing\n", nomfichier);
         return;
     }
 
-    // write the data structures to the file
+    
     if (fwrite(&p, sizeof(Personne), 1, fichier) != 1) {
         fprintf(stderr, "Error: Failed to write to file '%s'\n", nomfichier);
         fclose(fichier);
@@ -395,13 +392,13 @@ void sauvegarder(Personne p, background b, char *nomfichier)
 
 void charger(Personne *p, background *b, char *nomfichier)
 {
-    FILE *fichier = fopen(nomfichier, "rb"); // open file for reading in binary mode
+    FILE *fichier = fopen(nomfichier, "rb"); 
     if (fichier == NULL) {
         fprintf(stderr, "Error: Cannot open file '%s' for reading\n", nomfichier);
         return;
     }
 
-    // read the data structures from the file
+    
     if (fread(p, sizeof(Personne), 1, fichier) != 1) {
         fprintf(stderr, "Error: Failed to read from file '%s'\n", nomfichier);
         fclose(fichier);
