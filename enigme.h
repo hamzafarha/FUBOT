@@ -66,3 +66,4 @@ void charger(Personne *p, background *b, char *nomfichier);
 
 #endif // ENIGME_H_INCLUDED
 
+
