@@ -13,6 +13,7 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_mixer.h>
@@ -20,9 +21,52 @@
 #include "fonction.h"
 /**
 * @brief To initialize the background bg .
-* @param b the background
+* @param b the background b.
 * @return Nothing
 */
+/*void init_background(background *bg)
+{
+	bg->image1=IMG_Load("easy.png");
+	if(!bg->image1)
+	{
+		fprintf(stderr,"Impossible de charger l'image du fond %s :%s\n","background.png",IMG_GetError());
+		exit(EXIT_FAILURE);
+	}
+	bg->image2=IMG_Load("medium.png");
+	if(!bg->image2)
+	{
+		fprintf(stderr,"Impossible de charger l'image du fond %s :%s\n","background.png",IMG_GetError());
+		exit(EXIT_FAILURE);
+	}
+	bg->image3=IMG_Load("hard.png");
+	if(!bg->image3)
+	{
+		fprintf(stderr,"Impossible de charger l'image du fond %s :%s\n","background.png",IMG_GetError());
+		exit(EXIT_FAILURE);
+	}
+
+        bg->music1= Mix_LoadMUS("easy.mp3");
+        bg->music2= Mix_LoadMUS("medium.mp3");
+        bg->music3= Mix_LoadMUS("hard.mp3");
+	bg->camerapos.x=0;
+	bg->camerapos.y=1726-SCREEN_HEIGHT;
+	bg->camerapos.w=SCREEN_WIDTH;
+	bg->camerapos.h=SCREEN_HEIGHT;
+	bg->screenpos.x=0;
+	bg->screenpos.y=0;
+	bg->screenpos.w=SCREEN_WIDTH;
+	bg->screenpos.h=SCREEN_HEIGHT;
+	bg->direction=1;
+	bg->musicplaying=0;
+	bg->images[0] = IMG_Load("yeux_ouverts.png");
+       bg->images[1] = IMG_Load("yeux_demi_fermes.png");
+       bg->images[2] = IMG_Load("yeux_fermes.png");
+       bg->pos.x=-4000;
+       printf("%d",bg->pos.x);
+       bg->pos.y=-100;
+       bg->pos.w=bg->images[0]->w;
+       bg->pos.h=bg->images[0]->h;
+}*/
 void init_background(background *bg)
 {
 	bg->image1=IMG_Load("easy.png");
@@ -47,15 +91,13 @@ void init_background(background *bg)
         bg->music1= Mix_LoadMUS("easy.mp3");
         bg->music2= Mix_LoadMUS("medium.mp3");
         bg->music3= Mix_LoadMUS("hard.mp3");
-
-	
 	bg->camerapos.x=0;
 	bg->camerapos.y=1726-SCREEN_HEIGHT;
-	bg->camerapos.w=SCREEN_WIDTH;
+	bg->camerapos.w=SCREEN_WIDTH/2;
 	bg->camerapos.h=SCREEN_HEIGHT;
 	bg->screenpos.x=0;
 	bg->screenpos.y=0;
-	bg->screenpos.w=SCREEN_WIDTH;
+	bg->screenpos.w=SCREEN_WIDTH/2;
 	bg->screenpos.h=SCREEN_HEIGHT;
 	bg->direction=1;
 	bg->musicplaying=0;
@@ -86,18 +128,14 @@ void init_background2(background *bg2)
 		fprintf(stderr,"Impossible de charger l'image du fond %s :%s\n","background.png",IMG_GetError());
 		exit(EXIT_FAILURE);
 	}
-        bg2->music1= Mix_LoadMUS("easy.mp3");
-        bg2->music2= Mix_LoadMUS("medium.mp3");
-        bg2->music3= Mix_LoadMUS("hard.mp3");
 	bg2->camerapos.x=0;
-	bg2->camerapos.y=1726;
-	bg2->camerapos.w=SCREEN_WIDTH;
+	bg2->camerapos.y=1726-SCREEN_HEIGHT;
+	bg2->camerapos.w=2+SCREEN_WIDTH/2;
 	bg2->camerapos.h=SCREEN_HEIGHT;
-	/*bg2->screenpos.x=SCREEN_WIDTH/2;
+	bg2->screenpos.x=2+SCREEN_WIDTH/2;
 	bg2->screenpos.y=0;
-	bg2->screenpos.w=2+SCREEN_WIDTH/2;
-	bg2->screenpos.h=SCREEN_HEIGHT;*/
-
+	bg2->screenpos.w=SCREEN_WIDTH/2;
+	bg2->screenpos.h=SCREEN_HEIGHT;
 	bg2->direction=1;
 	bg2->musicplaying=0;
 }
@@ -184,7 +222,7 @@ void partage_ecran(background *bg2, SDL_Surface *screen,int difficulte2)
     }
 }
 /**
-* @brief To scroll the background to o 4 directions .
+* @brief To scroll the background to 4 directions .
 * @param bg2 the background
 * @param direction integer
 * @param pas integer 
@@ -276,111 +314,52 @@ void scrolling2(background *bg2,int direction,int pas)
 * @param screen the screen
 * @return Nothing
 */
-void animerback(background *bg,SDL_Surface *screen)
-{
-    static int x = 0;
-    static int y = 0;
-    static int dx = 2;
-    static int dy = 2;
-    static SDL_Surface *nuage = NULL;
-    
 
-    if (nuage == NULL) {
-        nuage = IMG_Load("nuage.png");
-    }
-
-    x += dx;
-    y += dy;
-
-    if (x + nuage->w >= bg->camerapos.w || x <= 0) {
-        dx = -dx;
-    }
-
-    SDL_Rect nuagePos = { x, 50, nuage->w, nuage->h };
-    SDL_BlitSurface(nuage, NULL, screen, &nuagePos);
-    
-    static int x1 = 0;
-    static int y1 = 250;
-    static int dx1 = 2;
-    static int dy1 = 2;
-    static SDL_Surface *ballon = NULL;
-   
-    if (ballon == NULL) {
-        ballon = IMG_Load("ballon.png");
-    }
-
-    x1 += dx1;
-    y1 += dy1;
-
-    if (y1 + ballon->w >= 400 || y1 <= 200) {
-        dy1 = -dy1;
-    }
-
-    SDL_Rect ballonPos = { 200, y1, ballon->w, ballon->h };
-    SDL_BlitSurface(ballon, &bg->camerapos, screen, &ballonPos);
-}
-/**
-* @brief To animate the background .
-* @param bg2 the background
-* @param screen the screen
-* @return Nothing
-*/
-void animerback2(background *bg2,SDL_Surface *screen)
-{
-    static int x = 0;
-    static int y = 0;
-    static int dx = 2;
-    static int dy = 2;
-    static SDL_Surface *nuage = NULL;
-    
-
-    if (nuage == NULL) {
-        nuage = IMG_Load("nuage.png");
-    }
-
-    x += dx;
-    y += dy;
-
-    if (x + nuage->w >= bg2->camerapos.w || x <= 0) {
-        dx = -dx;
-    }
-
-    SDL_Rect nuagePos = { x+bg2->camerapos.w, 50, nuage->w, nuage->h };
-    SDL_BlitSurface(nuage, NULL, screen, &nuagePos);
-    
-    static int x1 = 0;
-    static int y1 = 250;
-    static int dx1 = 2;
-    static int dy1 = 2;
-    static SDL_Surface *ballon = NULL;
-   
-    if (ballon == NULL) {
-        ballon = IMG_Load("ballon.png");
-    }
-
-    x1 += dx1;
-    y1 += dy1;
-
-    if (y1 + ballon->w >= 400 || y1 <= 200) {
-        dy1 = -dy1;
-    }
-
-    SDL_Rect ballonPos = { 200+bg2->camerapos.w, y1, ballon->w, ballon->h };
-    SDL_BlitSurface(ballon, &bg2->camerapos, screen, &ballonPos);
-}
 /**
 * @brief To save the score .
 * @param s1 the scoreinfo .
 * @param filename string .
 * @return Nothing
 */
+void animerback(SDL_Surface *screen) {
+    SDL_Surface *images[3];
+    images[0] = IMG_Load("yeux_ouverts.png");
+    images[1] = IMG_Load("yeux_demi_fermes.png");
+    images[2] = IMG_Load("yeux_fermes.png");
+    SDL_Rect pos={-2000,0,images[0]->w,images[0]->h};
+    for (int i = 0; i < 3; i++) {
+     
+        SDL_BlitSurface(images[i], NULL, screen,NULL);
+        SDL_Flip(screen);
+        SDL_Delay(10);
+    }
+}
+void animerback2(SDL_Surface *screen)
+{
+    SDL_Surface *images[3];
+    images[0] = IMG_Load("yeux_ouverts.png");
+    images[1] = IMG_Load("yeux_demi_fermes.png");
+    images[2] = IMG_Load("yeux_fermes.png");
+    SDL_Rect pos={2+SCREEN_WIDTH/2,0,images[0]->w,images[0]->h};
+    for (int i = 0; i < 3; i++) {
+     
+        SDL_BlitSurface(images[i], NULL, screen,&pos);
+        SDL_Flip(screen);
+        SDL_Delay(10);
+    }
+} 
 void savescore(scoreinfo s1,char *filename)
 {
 	FILE *file=fopen(filename,"a+");
+	s1.score=rand()% 100+1;
+	s1.temps=rand()% 100+1;
+	strncpy(s1.playername,"hamza",sizeof("hamza"));
+	printf("\n aaaaaa");
 	if(file==NULL){
 		printf("Erreur lors de l'ouverture du fichier %s \n",filename);
 	}
-	fprintf(file,"score: %d temps: %d playername:%s \n",s1.score,s1.temps,s1.playername);
+	else
+		fprintf(file,"%d %d %s \n",s1.score,s1.temps,s1.playername);
 	fclose(file);
 }
 /**
@@ -390,17 +369,16 @@ void savescore(scoreinfo s1,char *filename)
 * @return Nothing
 */
 void bestscore(char *filename, scoreinfo trois[]) {
-    scoreinfo *scores = NULL;
     int nbScores = 0;
     scoreinfo s;
     scoreinfo tmp;
     int i,j,z;
     TTF_Font *police;
-    SDL_Color couleurNoire={255,255,255};
-    SDL_Surface *texte;
-    SDL_Rect position;
+    SDL_Color couleurNoire={0,0,0};
     char ch[100];
-  
+    s.position1.x=400;
+    s.position2.x=500;
+    s.position3.x=600;
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
         printf("Erreur lors de l'ouverture du fichier %s\n", filename);
@@ -408,31 +386,26 @@ void bestscore(char *filename, scoreinfo trois[]) {
     }  
   
         
-        while (fscanf(file, "%d %d %s\n", &scores[nbScores].score,&scores[nbScores].temps,scores[nbScores].playername) == 3) {
-   
-            nbScores++;
+       while (!feof(file)) {
+             fscanf(file, "%d %d %s \n", &s.score,&s.temps,s.playername);
+   	     trois[nbScores]=s;
+             nbScores++;
         }
-
     fclose(file);
-
-
     for (i = 0; i < nbScores - 1; i++) {
         for (j = i + 1; j < nbScores; j++) {
-            if (scores[i].score < scores[j].score || (scores[i].score == scores[j].score && scores[i].temps > scores[j].temps)) {
+            if (trois[i].score < trois[j].score || (trois[i].score == trois[j].score && trois[i].temps > trois[j].temps)) {
               
-                tmp = scores[i];
-                scores[i] = scores[j];
-                scores[j] = tmp;
-            }
-        }
+                tmp = trois[i];
+                trois[i] = trois[j];
+                trois[j] = tmp;
+     
+  
     }
-
-    
-
-
-    free(scores);
-    TTF_Init();
-	police=TTF_OpenFont("times.ttf",65);
+}
+}
+	TTF_Init();
+	police=TTF_OpenFont("times.ttf",40);
 	
 	for(z=0;z<3;z++)
 	{
@@ -443,45 +416,41 @@ void bestscore(char *filename, scoreinfo trois[]) {
 	trois[z].surface2=TTF_RenderText_Blended(police,ch,couleurNoire);
 	
 	trois[z].surface3=TTF_RenderText_Blended(police,trois[z].playername,couleurNoire);
-
 	}
-	TTF_CloseFont(police);
-}
+	TTF_CloseFont(police);   
+}	
 /**
 * @brief To show the best 3 scores .
 * @param trois table of scoreinfo .
 * @param screen the screen
 * @return Nothing
 */
-void afficherbest(SDL_Surface *screen, scoreinfo trois[]) {
-    int z;
+void afficherbest(SDL_Surface *screen, scoreinfo trois[]) 
+{
+    int z,i;
+    for(i=0;i<3;i++)
+    {
+    	printf("%d %d %s",trois[i].score,trois[i].temps,trois[i].playername);
+    }
     for(z=0;z<3;z++)
 	{
 	if(trois[z].surface1!=NULL && trois[z].surface2!=NULL && trois[z].surface3!=NULL)
-		{trois[1].position1.y=250;
-		trois[1].position2.y=250;
-		trois[1].position3.y=250;
+		{trois[0].position1.y=230;
+		trois[0].position2.y=230;
+		trois[0].position3.y=230;
 		
-		trois[2].position1.y+=300;
-		trois[2].position2.y+=300;
-		trois[2].position3.y=300;
+		trois[1].position1.y=300;
+		trois[1].position2.y=300;
+		trois[1].position3.y=300;
 		
-		trois[3].position1.y+=350;
-		trois[3].position2.y+=350;
-		trois[3].position3.y=350;
-		
-		
-		
-		
+		trois[2].position1.y=370;
+		trois[2].position2.y=370;
+		trois[2].position3.y=370;
 		
 		SDL_BlitSurface(trois[z].surface1,NULL,screen,&(trois[z].position1));
 		SDL_BlitSurface(trois[z].surface2,NULL,screen,&(trois[z].position2));
 		SDL_BlitSurface(trois[z].surface3,NULL,screen,&(trois[z].position3));
-		
-		
-		printf("\n aaa");
-		
-		
+		printf("\n afficche");
 		}
 		}
 }
